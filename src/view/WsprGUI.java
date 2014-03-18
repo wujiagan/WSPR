@@ -7,11 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+
+import process.WSHSP;
 
 public class WsprGUI extends JFrame{
 	private int width = 300, height = 300;
@@ -22,7 +23,7 @@ public class WsprGUI extends JFrame{
 	private JButton quit_btn = new JButton("quit");
 	private JFileChooser file_chooser = new JFileChooser();
 	
-	private File input, goal;
+	private WSHSP app = new WSHSP();
 	
 	public WsprGUI() {
 		initComponent();
@@ -32,8 +33,8 @@ public class WsprGUI extends JFrame{
 		file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int returnValue = file_chooser.showOpenDialog(this);
 		if(JFileChooser.APPROVE_OPTION == returnValue) {
-			input = file_chooser.getSelectedFile();
-			System.out.println(input);
+			app.setInput(file_chooser.getSelectedFile());
+			System.out.println(app.getInput());
 		}
 	}
 	
@@ -41,9 +42,17 @@ public class WsprGUI extends JFrame{
 		file_chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES );
 		int returnValue = file_chooser.showOpenDialog(this);
 		if(JFileChooser.APPROVE_OPTION == returnValue) {
-			goal = file_chooser.getSelectedFile();
-			System.out.println(goal);
+			app.setGoal(file_chooser.getSelectedFile());
+			System.out.println(app.getGoal());
 		}
+	}
+	
+	private void run() {
+		app.run();
+	}
+	
+	private void quit() {
+		System.exit(1);
 	}
 	
 	/**
@@ -56,11 +65,7 @@ public class WsprGUI extends JFrame{
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((screen.width-this.getSize().width)/2,
 				(screen.height-this.getSize().height)/2);
-		this.addWindowListener(new WindowAdapter(){
-			public void windowClosing(WindowEvent e){
-				System.exit(1);
-			}
-		});
+		this.addWindowListener(new WSPRWindowListener());
 		
 		this.setLayout(null);
 		wsdl_btn.setBounds(100, 30, 100, 30);
@@ -73,26 +78,48 @@ public class WsprGUI extends JFrame{
 		this.add(query_btn);
 		run_btn.setBounds(100, 150, 100, 30);
 		run_btn.setFont(font);
+		run_btn.addActionListener(new RunBtnListener());
 		this.add(run_btn);
 		quit_btn.setBounds(100, 210, 100, 30);
 		quit_btn.setFont(font);
+		quit_btn.addActionListener(new QuitBtnListener());
 		this.add(quit_btn);
 		
 		this.setResizable(false);
 		this.setVisible(true);
 	}
 	
-	private class WsdlBtnListener implements ActionListener{
+	private class WsdlBtnListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			open_wsdl();
 		}
 	}
 	
-	private class QueryBtnListener implements ActionListener{
+	private class QueryBtnListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			open_query();
+		}
+	}
+	
+	private class RunBtnListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			run();
+		}
+	}
+	
+	private class QuitBtnListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			quit();
+		}
+	}
+	
+	private class WSPRWindowListener extends WindowAdapter{
+		public void windowClosing(WindowEvent e){
+			quit();
 		}
 	}
 	
