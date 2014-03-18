@@ -20,19 +20,30 @@ public class WsprGUI extends JFrame{
 	private JButton query_btn = new JButton("query");
 	private JButton run_btn = new JButton("run");
 	private JButton quit_btn = new JButton("quit");
-	private JFileChooser fileChooser = new JFileChooser();
+	private JFileChooser file_chooser = new JFileChooser();
 	
-	private File input;
+	private File input, goal;
 	
 	public WsprGUI() {
 		initComponent();
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	}
 	
 	private void open_wsdl() {
-		fileChooser.showOpenDialog(this);
-		input = fileChooser.getSelectedFile();
-		System.out.println(input);
+		file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int returnValue = file_chooser.showOpenDialog(this);
+		if(JFileChooser.APPROVE_OPTION == returnValue) {
+			input = file_chooser.getSelectedFile();
+			System.out.println(input);
+		}
+	}
+	
+	private void open_query() {
+		file_chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES );
+		int returnValue = file_chooser.showOpenDialog(this);
+		if(JFileChooser.APPROVE_OPTION == returnValue) {
+			goal = file_chooser.getSelectedFile();
+			System.out.println(goal);
+		}
 	}
 	
 	/**
@@ -58,6 +69,7 @@ public class WsprGUI extends JFrame{
 		this.add(wsdl_btn);
 		query_btn.setBounds(100, 90, 100, 30);
 		query_btn.setFont(font);
+		query_btn.addActionListener(new QueryBtnListener());
 		this.add(query_btn);
 		run_btn.setBounds(100, 150, 100, 30);
 		run_btn.setFont(font);
@@ -70,10 +82,17 @@ public class WsprGUI extends JFrame{
 		this.setVisible(true);
 	}
 	
-	class WsdlBtnListener implements ActionListener{
+	private class WsdlBtnListener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			open_wsdl();
+		}
+	}
+	
+	private class QueryBtnListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			open_query();
 		}
 	}
 	
