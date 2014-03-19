@@ -33,8 +33,8 @@ public class WsprGUI extends JFrame{
 		file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int returnValue = file_chooser.showOpenDialog(this);
 		if(JFileChooser.APPROVE_OPTION == returnValue) {
-			app.setInput(file_chooser.getSelectedFile());
-			System.out.println(app.getInput());
+			app.setTestDataDir(file_chooser.getSelectedFile());
+			System.out.println(app.getTestDataDir());
 		}
 	}
 	
