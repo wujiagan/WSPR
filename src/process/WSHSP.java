@@ -5,12 +5,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import model.WebService;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import webService.WebService;
 
 public class WSHSP {
 	/**
@@ -43,6 +44,13 @@ public class WSHSP {
 		this.goal = goal;
 	}
 	
+	/**
+	 * 从wsdl文件中读取并保存在WebService实例中
+	 * @param file
+	 * @param service_name
+	 * @return
+	 * @throws DocumentException
+	 */
 	public WebService readIeeeWsdl(File file, String service_name) throws DocumentException {
 		WebService service = new WebService(service_name);
 		SAXReader reader = new SAXReader();		//建立SAX解析读取
@@ -52,16 +60,27 @@ public class WSHSP {
 		for(Iterator iter = root.elementIterator("message"); iter.hasNext();) {//遍历根节点以下所有子节点
 			Element massage = (Element) iter.next();
 			if(massage.attribute("name").getValue().equals(service_name + "_Request")) {
-				for(Iterator child_iter = massage.elementIterator("message"); child_iter.hasNext();){
-					
-				}
-					
+				for(Iterator theInput = massage.elementIterator("part"); theInput.hasNext();){
+					Element inputPart = (Element) theInput.next();
+					service.addInput(inputPart.attributeValue("name"));
+				}		
 			}
-			
+			if(massage.attribute("name").getValue().equals(service_name + "_Response")) {
+				for(Iterator theInput = massage.elementIterator("part"); theInput.hasNext();){
+					Element inputPart = (Element) theInput.next();
+					service.addOutput(inputPart.attributeValue("name"));
+				}
+			}
 		}
+		System.out.println(service);
 		return service;
 	}
 	
+	/**
+	 * 遍历数据集
+	 * @param dir
+	 * @throws DocumentException
+	 */
 	public void loadWSDL(File dir) throws DocumentException {
 		Map<String, WebService> returnMap = new HashMap<String, WebService>(); 
 		for(File file : dir.listFiles()) {
