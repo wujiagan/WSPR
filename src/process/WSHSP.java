@@ -1,6 +1,14 @@
 package process;
 
 import java.io.File;
+import java.util.List;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+
+import webService.WebService;
 
 public class WSHSP {
 	/**
@@ -29,6 +37,18 @@ public class WSHSP {
 		this.goal = goal;
 	}
 	
+	public List<WebService> readIeeeGoal(File goalFile) throws DocumentException {
+		if(!goalFile.exists()){
+			System.out.println("Failure to open " + goalFile + ".");
+			System.exit(1);
+		}
+		SAXReader reader = new SAXReader();		//建立SAX解析读取
+		Document doc = null;
+		doc = reader.read(goalFile);		//读取文档
+		Element root = doc.getRootElement();
+		return null;
+	}
+	
 	/**
 	 * check the input file and the goal file, if not null, then invoke the process() 
 	 */
@@ -45,6 +65,6 @@ public class WSHSP {
 	}
 	
 	public void process() {
-		
+		System.out.println("Loading the goal file \""+this.goal+"\"...");
 	}
 }
