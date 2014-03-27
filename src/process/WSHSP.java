@@ -24,8 +24,10 @@ public class WSHSP {
 	 */
 	private File goal;
 	
+	private SAXReader reader = null;		//建立SAX解析读取
+	
 	public WSHSP() {
-		
+		this.reader = new SAXReader();
 	}
 	
 	public File getTestDataDir() {
@@ -49,11 +51,10 @@ public class WSHSP {
 	 * @param file
 	 * @param service_name
 	 * @return
-	 * @throws DocumentException
+	 * @throws DocumentException 
 	 */
-	public WebService readIeeeWsdl(File file, String service_name) throws DocumentException {
+	public WebService readIeeeWsdl(File file, String service_name) throws DocumentException{
 		WebService service = new WebService(service_name);
-		SAXReader reader = new SAXReader();		//建立SAX解析读取
 		Document doc = null;
 		doc = reader.read(file);		//读取文档
 		Element root = doc.getRootElement();
@@ -79,14 +80,14 @@ public class WSHSP {
 	/**
 	 * 遍历数据集
 	 * @param dir
-	 * @throws DocumentException
+	 * @throws DocumentException 
 	 */
 	public void loadWSDL(File dir) throws DocumentException {
 		Map<String, WebService> returnMap = new HashMap<String, WebService>(); 
 		for(File file : dir.listFiles()) {
-			String file_name = file.getName();
-			String service_name = file_name.substring(0, file_name.lastIndexOf('.'));
-			returnMap.put(service_name, readIeeeWsdl(file, service_name));
+			String fileName = file.getName();
+			String serviceName = fileName.substring(0, fileName.lastIndexOf('.'));
+			returnMap.put(serviceName, readIeeeWsdl(file, serviceName));
 		}
 	}
 	
@@ -94,7 +95,7 @@ public class WSHSP {
 	 * 提取query文件信息
 	 * @param goalFile
 	 * @return
-	 * @throws DocumentException
+	 * @throws DocumentException 
 	 */
 	public WebService readIeeeGoal(File goalFile) throws DocumentException {
 		if(!goalFile.exists()){
@@ -102,7 +103,6 @@ public class WSHSP {
 			System.exit(1);
 		}
 		WebService service = null;
-		SAXReader reader = new SAXReader();		//建立SAX解析读取
 		Document doc = null;
 		doc = reader.read(goalFile);		//读取文档
 		Element root = doc.getRootElement();
@@ -124,25 +124,24 @@ public class WSHSP {
 	
 	/**
 	 * check the input file and the goal file, if not null, then invoke the process() 
+	 * @throws Exception 
 	 */
-	public void run() {
+	public void run() throws Exception {
 		if(this.goal == null || this.testDataDir == null) {
 			if(this.testDataDir == null)
 				System.out.println("You need to enter the directory for the test data");
 			if(this.goal == null)
 				System.out.println("You need to enter a filename for the goal wsdl");
 		}else {
-			try {
-				process();
-			} catch (DocumentException e) {
-			}
+			process();
 			System.out.println("end");
 		}
 	}
 	
-	public void process() throws DocumentException {
+	public void process() throws Exception {
 		System.out.println("Loading the goal file \""+this.goal+"\"...");
 		WebService service = readIeeeGoal(this.goal);
+		System.out.print("the goal:" + service);
 		System.out.println("Done loaded the goal file of " + this.goal);
 		loadWSDL(this.testDataDir);
 		System.out.println("Loading the WSDL files in \"" + this.testDataDir + "\"...");

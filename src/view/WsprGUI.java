@@ -15,13 +15,17 @@ import javax.swing.JFrame;
 import process.WSHSP;
 
 public class WsprGUI extends JFrame{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int width = 300, height = 300;
 	private Font font = new Font("宋体", 0, 20);
-	private JButton wsdl_btn = new JButton("wsdl");
-	private JButton query_btn = new JButton("query");
-	private JButton run_btn = new JButton("run");
-	private JButton quit_btn = new JButton("quit");
-	private JFileChooser file_chooser = new JFileChooser();
+	private JButton wsdlBtn = new JButton("wsdl");
+	private JButton queryBtn = new JButton("query");
+	private JButton runBtn = new JButton("run");
+	private JButton quitBtn = new JButton("quit");
+	private JFileChooser fileChooser = new JFileChooser();
 	
 	private WSHSP app = new WSHSP();
 	
@@ -29,26 +33,29 @@ public class WsprGUI extends JFrame{
 		initComponent();
 	}
 	
-	private void open_wsdl() {
-		file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		int returnValue = file_chooser.showOpenDialog(this);
+	private void openWsdl() {
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int returnValue = fileChooser.showOpenDialog(this);
 		if(JFileChooser.APPROVE_OPTION == returnValue) {
-			app.setTestDataDir(file_chooser.getSelectedFile());
+			app.setTestDataDir(fileChooser.getSelectedFile());
 			System.out.println(app.getTestDataDir());
 		}
 	}
 	
-	private void open_query() {
-		file_chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES );
-		int returnValue = file_chooser.showOpenDialog(this);
+	private void openQuery() {
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES );
+		int returnValue = fileChooser.showOpenDialog(this);
 		if(JFileChooser.APPROVE_OPTION == returnValue) {
-			app.setGoal(file_chooser.getSelectedFile());
+			app.setGoal(fileChooser.getSelectedFile());
 			System.out.println(app.getGoal());
 		}
 	}
 	
 	private void run() {
-		app.run();
+		try {
+			app.run();
+		} catch (Exception e) {
+		}
 	}
 	
 	private void quit() {
@@ -68,22 +75,22 @@ public class WsprGUI extends JFrame{
 		this.addWindowListener(new WSPRWindowListener());
 		
 		this.setLayout(null);
-		wsdl_btn.setBounds(100, 30, 100, 30);
-		wsdl_btn.setFont(font);
-		wsdl_btn.addActionListener(new WsdlBtnListener());
-		this.add(wsdl_btn);
-		query_btn.setBounds(100, 90, 100, 30);
-		query_btn.setFont(font);
-		query_btn.addActionListener(new QueryBtnListener());
-		this.add(query_btn);
-		run_btn.setBounds(100, 150, 100, 30);
-		run_btn.setFont(font);
-		run_btn.addActionListener(new RunBtnListener());
-		this.add(run_btn);
-		quit_btn.setBounds(100, 210, 100, 30);
-		quit_btn.setFont(font);
-		quit_btn.addActionListener(new QuitBtnListener());
-		this.add(quit_btn);
+		wsdlBtn.setBounds(100, 30, 100, 30);
+		wsdlBtn.setFont(font);
+		wsdlBtn.addActionListener(new WsdlBtnListener());
+		this.add(wsdlBtn);
+		queryBtn.setBounds(100, 90, 100, 30);
+		queryBtn.setFont(font);
+		queryBtn.addActionListener(new QueryBtnListener());
+		this.add(queryBtn);
+		runBtn.setBounds(100, 150, 100, 30);
+		runBtn.setFont(font);
+		runBtn.addActionListener(new RunBtnListener());
+		this.add(runBtn);
+		quitBtn.setBounds(100, 210, 100, 30);
+		quitBtn.setFont(font);
+		quitBtn.addActionListener(new QuitBtnListener());
+		this.add(quitBtn);
 		
 		this.setResizable(false);
 		this.setVisible(true);
@@ -92,14 +99,14 @@ public class WsprGUI extends JFrame{
 	private class WsdlBtnListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			open_wsdl();
+			openWsdl();
 		}
 	}
 	
 	private class QueryBtnListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			open_query();
+			openQuery();
 		}
 	}
 	
