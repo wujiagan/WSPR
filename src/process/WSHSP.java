@@ -3,8 +3,11 @@ package process;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import model.Path;
 import model.WebService;
 
 import org.dom4j.Document;
@@ -26,6 +29,10 @@ public class WSHSP {
 	
 	private SAXReader reader = null;		//建立SAX解析读取
 	
+	private Map<String, List<WebService>> inputList = new HashMap<String, List<WebService>>();
+	private Map<String, List<WebService>> outputList = new HashMap<String, List<WebService>>();
+	List<WebService> webServiceList = null;
+	
 	public WSHSP() {
 		this.reader = new SAXReader();
 	}
@@ -46,6 +53,15 @@ public class WSHSP {
 		this.goal = goal;
 	}
 	
+
+	public Map<String, List<WebService>> getInputList() {
+		return inputList;
+	}
+
+	public void setInputList(Map<String, List<WebService>> inputList) {
+		this.inputList = inputList;
+	}
+
 	/**
 	 * 从wsdl文件中读取并保存在WebService实例中
 	 * @param file
@@ -73,7 +89,7 @@ public class WSHSP {
 				}
 			}
 		}
-		System.out.println(service);
+		//System.out.println(service);
 		return service;
 	}
 	
@@ -82,13 +98,14 @@ public class WSHSP {
 	 * @param dir
 	 * @throws DocumentException 
 	 */
-	public void loadWSDL(File dir) throws DocumentException {
-		Map<String, WebService> returnMap = new HashMap<String, WebService>(); 
+	public List<WebService> loadWSDL(File dir) throws DocumentException {
+		List<WebService> list = new LinkedList<WebService>(); 
 		for(File file : dir.listFiles()) {
 			String fileName = file.getName();
 			String serviceName = fileName.substring(0, fileName.lastIndexOf('.'));
-			returnMap.put(serviceName, readIeeeWsdl(file, serviceName));
+			list.add(readIeeeWsdl(file, serviceName));
 		}
+		return list;
 	}
 	
 	/**
@@ -138,13 +155,60 @@ public class WSHSP {
 		}
 	}
 	
+	public void composeService(WebService goalService) {
+		System.out.println("{ goal service:" + goalService.getName() + "}");
+		System.out.print("goal input: [ ");
+		Iterator<String> itor = goalService.getInputList().keySet().iterator();
+		while(itor.hasNext()) {
+			String aInput = itor.next();
+			System.out.print(aInput + ", ");
+		}
+		System.out.println("]");
+		System.out.print("goal output: [ ");
+		itor = goalService.getOutputList().keySet().iterator();
+		while(itor.hasNext()) {
+			String aOutput = itor.next();
+			System.out.print(aOutput + ", ");
+		}
+		System.out.println("]");
+		
+		System.out.println("searching ...");
+		Path myPath = new Path(this.webServiceList, goalService);
+
+	}
+	
 	public void process() throws Exception {
 		System.out.println("Loading the goal file \""+this.goal+"\"...");
 		WebService service = readIeeeGoal(this.goal);
 		System.out.print("the goal:" + service);
 		System.out.println("Done loaded the goal file of " + this.goal);
-		loadWSDL(this.testDataDir);
+		webServiceList = loadWSDL(this.testDataDir);
+		Iterator<WebService> itor = webServiceList.iterator();
+		while(itor.hasNext()) {
+			WebService ws = itor.next();
+			Iterator<String> inputItor = ws.getInputList().keySet().iterator();
+			while(inputItor.hasNext()) {
+				String aInput = inputItor.next();
+				if(inputList.containsKey(aInput)) {
+					inputList.get(aInput).add(ws);
+				}else {
+					List<WebService> newList = new LinkedList<WebService>();
+					newList.add(ws);
+					inputList.put(aInput, newList);
+				}
+			}
+			Iterator<String> outputItor = ws.getInputList().keySet().iterator();
+			while(outputItor.hasNext()) {
+				String aOutput = outputItor.next();
+				if(inputList.containsKey(aOutput)) {
+					inputList.get(aOutput).add(ws);
+				}else {
+					List<WebService> newList = new LinkedList<WebService>();
+					newList.add(ws);
+					outputList.put(aOutput, newList);
+				}
+			}
+		}
 		System.out.println("Loading the WSDL files in \"" + this.testDataDir + "\"...");
-		
 	}
 }
